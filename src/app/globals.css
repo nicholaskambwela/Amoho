@@ -1,0 +1,190 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  /* Semantic mental health colors — muted, calming, work in both themes */
+  --color-safe-sage: #5a9e8f;
+  --color-safe-sage-foreground: #ffffff;
+  --color-safe-blue: #7c8fb5;
+  --color-safe-blue-foreground: #ffffff;
+  --color-safe-amber: #c4a265;
+  --color-safe-amber-foreground: #1c1917;
+  --color-safe-green: #6aab73;
+  --color-safe-green-foreground: #ffffff;
+  --color-safe-rose: #bf6b6b;
+  --color-safe-rose-foreground: #ffffff;
+}
+
+/*
+ * ═══════════════════════════════════════════════════════
+ *  "Safe Harbor" — Dual-theme design for SafeSpace
+ *  Research-backed mental health colour psychology
+ * ═══════════════════════════════════════════════════════
+ *
+ *  Light theme:
+ *    Warm white base (#fafaf9) — softer than pure white
+ *    Slightly deeper sage/blue for contrast on light surfaces
+ *    Stone-based neutrals for warmth and approachability
+ *
+ *  Dark theme (default):
+ *    Near-black zinc (#09090b) — reduces eye strain & overwhelm
+ *    Muted sage green (#5a9e8f) — calming, hope, renewal
+ *    Dusty periwinkle blue (#7c8fb5) — trust, balance, calm
+ *    Desaturated accents to avoid agitation
+ */
+
+/* ── Light Theme ──────────────────────────────────── */
+:root {
+  --radius: 0.75rem;
+  --background: #fafaf9;
+  --foreground: #1c1917;
+  --card: #ffffff;
+  --card-foreground: #1c1917;
+  --popover: #ffffff;
+  --popover-foreground: #1c1917;
+  --primary: #4a8b7d;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f5f4;
+  --secondary-foreground: #44403c;
+  --muted: #f5f5f4;
+  --muted-foreground: #78716c;
+  --accent: #6b7fa8;
+  --accent-foreground: #ffffff;
+  --destructive: #b85c5c;
+  --border: #e7e5e4;
+  --input: #e7e5e4;
+  --ring: #4a8b7d;
+  --chart-1: #4a8b7d;
+  --chart-2: #6b7fa8;
+  --chart-3: #b8964e;
+  --chart-4: #5a9963;
+  --chart-5: #b85c5c;
+  --sidebar: #f5f5f4;
+  --sidebar-foreground: #1c1917;
+  --sidebar-primary: #4a8b7d;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e7e5e4;
+  --sidebar-accent-foreground: #44403c;
+  --sidebar-border: #e7e5e4;
+  --sidebar-ring: #4a8b7d;
+}
+
+/* ── Dark Theme ───────────────────────────────────── */
+.dark {
+  --background: #09090b;
+  --foreground: #e4e4e7;
+  --card: #111113;
+  --card-foreground: #e4e4e7;
+  --popover: #111113;
+  --popover-foreground: #e4e4e7;
+  --primary: #5a9e8f;
+  --primary-foreground: #ffffff;
+  --secondary: #18181b;
+  --secondary-foreground: #d4d4d8;
+  --muted: #111113;
+  --muted-foreground: #71717a;
+  --accent: #7c8fb5;
+  --accent-foreground: #ffffff;
+  --destructive: #bf6b6b;
+  --border: #27272a;
+  --input: #27272a;
+  --ring: #5a9e8f;
+  --chart-1: #5a9e8f;
+  --chart-2: #7c8fb5;
+  --chart-3: #c4a265;
+  --chart-4: #6aab73;
+  --chart-5: #bf6b6b;
+  --sidebar: #0c0c0e;
+  --sidebar-foreground: #e4e4e7;
+  --sidebar-primary: #5a9e8f;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #18181b;
+  --sidebar-accent-foreground: #d4d4d8;
+  --sidebar-border: #27272a;
+  --sidebar-ring: #5a9e8f;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom scrollbar — adapts to theme */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* Subtle animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
