@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 export function WhatsAppFloatingButton() {
   const handleClick = () => {
     const message = encodeURIComponent(
-      "Check out Amoho — a safe, anonymous space to share your thoughts or whatever you're going through and find peer support."
+      "Check out Amoho — a safe, anonymous space to share your thoughts or whatever you're going through and find peer support. https://amoho.vercel.app/"
     );
     const number = "+260974307776";
     window.open(`https://wa.me/${number.replace(/[^0-9+]/g, "")}?text=${message}`, "_blank");
