@@ -96,7 +96,7 @@ const statusConfig: Record<string, { label: string; icon: typeof Clock; classNam
   },
 };
 
-const AUTH_KEY = "safespace_admin_auth";
+const AUTH_KEY = "amoho_admin_auth";
 
 function getStoredAuth(): { secret: string; admin: AdminUser } | null {
   if (typeof window === "undefined") return null;
