@@ -15,176 +15,361 @@ export interface HelplineInfo {
   city: string;
 }
 
+const SELF_HARM_KEYWORDS = [
+  "kill myself",
+  "end my life",
+  "suicide",
+  "suicidal",
+  "want to die",
+  "don't want to live",
+  "don't wanna live",
+  "no reason to live",
+  "better off dead",
+  "take my own life",
+  "end it all",
+  "hurt myself",
+  "self-harm",
+  "self harm",
+  "selfharm",
+  "overdose",
+  "kill meself",
+  "wanna die",
+  "ready to die",
+  "going to kill myself",
+  "planning to kill",
+  "slit my wrist",
+  "slit my wrists",
+  "hang myself",
+  "jump off",
+  "jump from",
+  "don't deserve to live",
+  "world without me",
+  "goodbye forever",
+  "final goodbye",
+  "can't go on",
+  "give up on life",
+  "no point living",
+  "not worth living",
+  "want to disappear",
+];
+
+const HARM_OTHERS_KEYWORDS = [
+  "kill them",
+  "kill him",
+  "kill her",
+  "murder",
+  "murder them",
+  "murder him",
+  "murder her",
+  "going to kill",
+  "want to kill",
+  "hurt someone",
+  "hurt them",
+  "hurt him",
+  "hurt her",
+  "revenge on",
+  "make them pay",
+  "make him pay",
+  "make her pay",
+  "destroy them",
+  "destroy him",
+  "destroy her",
+  "get back at",
+  "they will pay",
+  "they deserve to die",
+  "he deserve to die",
+  "she deserve to die",
+  "they deserve pain",
+  "violence",
+  "violent",
+  "stab",
+  "shoot them",
+  "shoot him",
+  "shoot her",
+  "beat them up",
+  "beat him up",
+  "beat her up",
+];
+
+const ABUSE_KEYWORDS = [
+  "abusing me",
+  "abuse me",
+  "sexually abused",
+  "rape",
+  "raped",
+  "sexual assault",
+  "molesting",
+  "molested",
+  "beating me",
+  "beats me",
+  "beaten by",
+  "physically abused",
+  "physical abuse",
+  "emotional abuse",
+  "verbally abused",
+  "domestic violence",
+  "domestic abuse",
+  "forced me to",
+  "forcing me to",
+  "doesn't stop hitting",
+  "keeps hitting",
+  "choked me",
+  "strangled me",
+  "locked me up",
+  "won't let me leave",
+  "trapped me",
+  "controlling me",
+  "threatens me",
+  "threatening me",
+];
+
+const HATE_SPEECH_KEYWORDS = [
+  "nigger",
+  "nigga",
+  "faggot",
+  "fag",
+  "kafir",
+  "racist",
+  "white supremacy",
+  "black supremacy",
+  "tribalism",
+  "tribalist",
+  "ethnic cleansing",
+  "genocide",
+  "superior race",
+  "inferior race",
+];
+
+const EXPLICIT_KEYWORDS = [
+  "porn",
+  "pornography",
+  "nudes",
+  "nude pics",
+  "send nudes",
+  "sex video",
+  "onlyfans",
+  "sugar daddy",
+  "sugar mummy",
+  "hook up",
+  "hookup for sex",
+  "looking for sex",
+  "sex for money",
+];
+
+const SPAM_PATTERNS = [
+  "click here to earn",
+  "make money fast",
+  "free bitcoin",
+  "crypto giveaway",
+  "lottery winner",
+  "you have won",
+  "claim your prize",
+  "subscribe to my",
+  "follow me on",
+  "buy now",
+  "discount code",
+  "promo code",
+  "limited time offer",
+  "act now",
+  "sign up now",
+  "join my channel",
+  "telegram channel",
+  "whatsapp group",
+  "scam",
+];
+
+const HARMFUL_REPLY_PATTERNS = [
+  "just get over it",
+  "get over it",
+  "just move on",
+  "you're being dramatic",
+  "you are being dramatic",
+  "stop being weak",
+  "man up",
+  "be a man",
+  "real men don't",
+  "you're too sensitive",
+  "you are too sensitive",
+  "nobody cares",
+  "no one cares",
+  "stop whining",
+  "stop complaining",
+  "it's your fault",
+  "it is your fault",
+  "you brought this on yourself",
+  "you deserve it",
+  "you asked for it",
+  "you're pathetic",
+  "you are pathetic",
+  "you're useless",
+  "you are useless",
+  "worthless",
+  "kill yourself",
+  "go kill yourself",
+  "nobody will miss you",
+  "no one will miss you",
+  "just die",
+  "you should die",
+  "attention seeker",
+  "you're faking it",
+  "you are faking it",
+  "not a real problem",
+  "first world problems",
+  "people have it worse",
+  "others have it worse",
+  "stop seeking attention",
+];
+
 export async function moderateContent(content: string): Promise<ModerationResult> {
   if (!content || content.trim().length === 0) {
     return { approved: false, crisis: false, reason: "Empty content" };
   }
 
+  const lowerContent = content.toLowerCase().trim();
+
   try {
-    const crisisCheck = await detectCrisis(content);
+    const crisisCheck = detectCrisis(lowerContent);
     if (crisisCheck.crisis) {
       return crisisCheck;
     }
 
-    const appropriatenessCheck = await checkAppropriateness(content);
+    const appropriatenessCheck = checkAppropriateness(lowerContent);
     return appropriatenessCheck;
 
   } catch (error) {
-    console.error("Moderation AI error, defaulting to pending:", error);
+    console.error("Moderation error, defaulting to pending:", error);
     return {
       approved: false,
       crisis: false,
-      reason: "Moderation service unavailable. Pending admin review.",
+      reason: "Moderation check failed. Pending admin review.",
     };
   }
 }
 
-async function detectCrisis(content: string): Promise<ModerationResult> {
-  const { default: ZAI } = await import("z-ai-web-dev-sdk");
-  const zai = await ZAI.create();
+function detectCrisis(content: string): ModerationResult {
+  for (const keyword of SELF_HARM_KEYWORDS) {
+    if (content.includes(keyword)) {
+      return buildCrisisResponse("self_harm", keyword);
+    }
+  }
 
-  const response = await zai.chat.completions.create({
-    messages: [
-      {
-        role: "system",
-        content: `You are a crisis detection AI for a mental health support community in Zambia. 
-Your ONLY job is to detect if the person writing is in immediate danger.
+  for (const keyword of HARM_OTHERS_KEYWORDS) {
+    if (content.includes(keyword)) {
+      return buildCrisisResponse("harm_others", keyword);
+    }
+  }
 
-You must respond with EXACTLY one of these JSON objects, nothing else:
+  for (const keyword of ABUSE_KEYWORDS) {
+    if (content.includes(keyword)) {
+      return buildCrisisResponse("abuse", keyword);
+    }
+  }
 
-{"crisis": false}
+  return { approved: false, crisis: false };
+}
 
-{"crisis": true, "type": "self_harm", "reason": "brief explanation"}
+function buildCrisisResponse(
+  type: "self_harm" | "harm_others" | "abuse",
+  matchedKeyword: string
+): ModerationResult {
+  const helplines: HelplineInfo[] = [];
 
-{"crisis": true, "type": "harm_others", "reason": "brief explanation"}
-
-{"crisis": true, "type": "abuse", "reason": "brief explanation"}
-
-Rules:
-- "self_harm": The person is talking about hurting themselves, suicide, self-injury, or feeling like they want to die
-- "harm_others": The person is threatening to hurt someone else or expressing violent intentions
-- "abuse": The person is describing ongoing physical, sexual, or severe emotional abuse
-- IMPORTANT: Someone expressing sadness, depression, loneliness, or grief is NOT a crisis — those are normal mental health struggles that should NOT be flagged
-- Someone saying "I feel lost" or "life is hard" is NOT self-harm
-- Only flag if there are clear indicators of immediate danger or ongoing abuse
-
-Respond with ONLY the JSON object. No other text.`,
-      },
-      {
-        role: "user",
-        content: content.substring(0, 1000),
-      },
-    ],
+  helplines.push({
+    name: CRISIS_LINE.name,
+    phone: CRISIS_LINE.phone,
+    type: "Crisis Line",
+    city: "Nationwide",
   });
 
-  const responseText = response.choices[0]?.message?.content?.trim() || "";
-
-  try {
-    const result = JSON.parse(responseText);
-
-    if (result.crisis === true) {
-      const helplines: HelplineInfo[] = [];
-
+  for (const h of HELPLINES) {
+    if (h.phones.length > 0) {
       helplines.push({
-        name: CRISIS_LINE.name,
-        phone: CRISIS_LINE.phone,
-        type: "Crisis Line",
-        city: "Nationwide",
+        name: h.name,
+        phone: h.phones[0],
+        type: h.type,
+        city: h.city,
       });
+    }
+  }
 
-      for (const h of HELPLINES) {
-        if (h.phones.length > 0) {
-          helplines.push({
-            name: h.name,
-            phone: h.phones[0],
-            type: h.type,
-            city: h.city,
-          });
-        }
-      }
+  const typeDescriptions: Record<string, string> = {
+    self_harm: "Message may indicate self-harm or suicidal thoughts",
+    harm_others: "Message may indicate intent to harm others",
+    abuse: "Message may indicate ongoing abuse",
+  };
 
+  return {
+    approved: false,
+    crisis: true,
+    crisisType: type,
+    reason: `${typeDescriptions[type]} (matched: "${matchedKeyword}")`,
+    helplines,
+  };
+}
+
+function checkAppropriateness(content: string): ModerationResult {
+  for (const keyword of HATE_SPEECH_KEYWORDS) {
+    if (content.includes(keyword)) {
       return {
         approved: false,
-        crisis: true,
-        crisisType: result.type,
-        reason: result.reason,
-        helplines,
+        crisis: false,
+        reason: `Flagged for potential hate speech (matched: "${keyword}")`,
       };
     }
-
-    return { approved: false, crisis: false };
-  } catch {
-    return { approved: false, crisis: false };
   }
-}
 
-async function checkAppropriateness(content: string): Promise<ModerationResult> {
-  const { default: ZAI } = await import("z-ai-web-dev-sdk");
-  const zai = await ZAI.create();
-
-  const response = await zai.chat.completions.create({
-    messages: [
-      {
-        role: "system",
-        content: `You are a content moderator for a mental health support community in Zambia called Amoho.
-
-Your job is to check if a message is appropriate for the community.
-
-Rules for APPROVAL (approved: true):
-- Genuine sharing of struggles, feelings, or experiences
-- Supportive, encouraging, or empathetic replies
-- Questions about mental health or seeking advice
-- Posts about anxiety, depression, grief, loneliness, stress, etc.
-- Personal stories and experiences
-- Encouraging someone to seek professional help
-- Normal mental health discussions
-
-Rules for FLAGGING (approved: false):
-- Hate speech, discrimination, or prejudice
-- Graphic descriptions of violence, self-harm methods, or abuse
-- Promotional content, spam, or advertisements
-- Dismissive replies like "just get over it" or "you're being dramatic"
-- Blaming victims or gaslighting
-- Sharing illegal content
-- Sexually explicit content unrelated to mental health
-
-You must respond with EXACTLY this JSON format, nothing else:
-
-{"approved": true}
-
-{"approved": false, "reason": "brief reason for flagging"}
-
-Be generous with approval. This is a support community where people share difficult feelings. 
-Only flag content that is genuinely harmful, hateful, or inappropriate.
-
-Respond with ONLY the JSON object. No other text.`,
-      },
-      {
-        role: "user",
-        content: content.substring(0, 1000),
-      },
-    ],
-  });
-
-  const responseText = response.choices[0]?.message?.content?.trim() || "";
-
-  try {
-    const result = JSON.parse(responseText);
-
-    if (result.approved === true) {
-      return { approved: true, crisis: false };
+  for (const keyword of EXPLICIT_KEYWORDS) {
+    if (content.includes(keyword)) {
+      return {
+        approved: false,
+        crisis: false,
+        reason: `Flagged for inappropriate content (matched: "${keyword}")`,
+      };
     }
+  }
 
+  for (const pattern of SPAM_PATTERNS) {
+    if (content.includes(pattern)) {
+      return {
+        approved: false,
+        crisis: false,
+        reason: `Flagged as potential spam (matched: "${pattern}")`,
+      };
+    }
+  }
+
+  for (const pattern of HARMFUL_REPLY_PATTERNS) {
+    if (content.includes(pattern)) {
+      return {
+        approved: false,
+        crisis: false,
+        reason: `Flagged for potentially harmful response (matched: "${pattern}")`,
+      };
+    }
+  }
+
+  // Check for excessive links (spam)
+  const linkCount = (content.match(/https?:\/\//g) || []).length;
+  if (linkCount >= 3) {
     return {
       approved: false,
       crisis: false,
-      reason: result.reason || "Flagged by moderation",
-    };
-  } catch {
-    return {
-      approved: false,
-      crisis: false,
-      reason: "Could not analyze content. Pending admin review.",
+      reason: `Flagged: contains ${linkCount} links (potential spam)`,
     };
   }
+
+  // Check for excessive CAPS (shouting/spam)
+  const words = content.split(/\s+/);
+  const capsWords = words.filter((word) => word.length > 3 && word === word.toUpperCase());
+  const capsRatio = words.length > 0 ? capsWords.length / words.length : 0;
+  if (capsRatio > 0.5 && words.length > 5) {
+    return {
+      approved: false,
+      crisis: false,
+      reason: "Flagged: excessive capitalization (potential spam)",
+    };
+  }
+
+  // CLEAN content — auto-approve!
+  return { approved: true, crisis: false };
 }
