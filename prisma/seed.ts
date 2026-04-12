@@ -16,9 +16,9 @@ async function seed() {
     const secret = process.env.ADMIN_SECRET || "safespace2024";
     const admin = await db.admin.create({
       data: {
-        name: "SafeSpace Admin",
-        email: "admin@safespace.zm",
-        phone: "+260 977 000000",
+        name: "Amoho Admin",
+        email: "eliteminds06@gmail.com",
+        phone: "+260 974307776",
         secret: hashSecret(secret),
         role: "superadmin",
       },
@@ -30,9 +30,9 @@ async function seed() {
 
   // 2. Create default contact info entries
   const contactEntries = [
-    { key: "primary_phone", value: "+260 977 000000", label: "Phone", icon: "phone", order: 0 },
-    { key: "whatsapp", value: "+260 977 000000", label: "WhatsApp", icon: "message-circle", order: 1 },
-    { key: "email", value: "admin@safespace.zm", label: "Email", icon: "mail", order: 2 },
+    { key: "primary_phone", value: "+260 974 307776", label: "Phone", icon: "phone", order: 0 },
+    { key: "whatsapp", value: "+260 974 307776", label: "WhatsApp", icon: "message-circle", order: 1 },
+    { key: "email", value: "eliteminds06@gmail.com", label: "Email", icon: "mail", order: 2 },
     { key: "crisis_line", value: "933", label: "Crisis Line (Lifeline Zambia)", icon: "alert-triangle", order: 3 },
   ];
 
