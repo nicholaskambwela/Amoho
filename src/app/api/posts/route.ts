@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { generateAnonymousName } from "@/lib/anonymous-names";
+import { moderateContent } from "@/lib/moderation";
 
-// GET: Return approved posts (newest first), include reply count
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -38,7 +38,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST: Create new post (status: "pending"), generate random anonymous name
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -75,28 +74,54 @@ export async function POST(request: NextRequest) {
 
     const postCategory = validCategories.includes(category) ? category : "General";
 
+    const moderation = await moderateContent(content.trim());
+
+    let postStatus: "approved" | "pending";
+    let responseMessage: string;
+
+    if (moderation.crisis) {
+      postStatus = "pending";
+      responseMessage = "Thank you for sharing. We care about you and want to make sure you're okay. Please reach out to one of the support services below — they are here to help you.";
+    } else if (moderation.approved) {
+      postStatus = "approved";
+      responseMessage = "Your story has been shared with the community. Thank you for being brave enough to share — you're not alone.";
+    } else {
+      postStatus = "pending";
+      responseMessage = "Your story has been submitted for review. It will appear in the community feed once approved. Thank you for sharing.";
+    }
+
     const post = await db.post.create({
       data: {
         anonymousName: generateAnonymousName(),
         content: content.trim(),
         category: postCategory,
-        status: "pending",
+        status: postStatus,
       },
     });
 
-    return NextResponse.json(
-      {
-        id: post.id,
-        anonymousName: post.anonymousName,
-        content: post.content,
-        category: post.category,
-        status: post.status,
-        createdAt: post.createdAt,
-        message:
-          "Your story has been submitted for review. It will appear in the community feed once approved. Thank you for sharing.",
-      },
-      { status: 201 }
-    );
+    const responseData: Record<string, unknown> = {
+      id: post.id,
+      anonymousName: post.anonymousName,
+      content: post.content,
+      category: post.category,
+      status: post.status,
+      createdAt: post.createdAt,
+      message: responseMessage,
+    };
+
+    if (moderation.crisis && moderation.helplines) {
+      responseData.crisisDetected = true;
+      responseData.crisisType = moderation.crisisType;
+      responseData.helplines = moderation.helplines;
+    }
+
+    if (!moderation.approved && !moderation.crisis) {
+      responseData.requiresReview = true;
+      responseData.flagReason = moderation.reason;
+    }
+
+    return NextResponse.json(responseData, { status: 201 });
+
   } catch (error) {
     console.error("Error creating post:", error);
     return NextResponse.json({ error: "Failed to create post" }, { status: 500 });
