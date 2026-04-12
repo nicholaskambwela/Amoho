@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { generateAnonymousName } from "@/lib/anonymous-names";
+import { moderateContent } from "@/lib/moderation";
 
-// GET: Return only approved replies for a post (public view)
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -37,7 +37,6 @@ export async function GET(
   }
 }
 
-// POST: Create reply for a post (pending approval)
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -59,7 +58,6 @@ export async function POST(
       return NextResponse.json({ error: "Your reply is too long. Please keep it under 1000 characters." }, { status: 400 });
     }
 
-    // Check if post exists and is approved
     const post = await db.post.findUnique({
       where: { id },
     });
@@ -68,25 +66,52 @@ export async function POST(
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
+    const moderation = await moderateContent(content.trim());
+
+    let replyStatus: "approved" | "pending";
+    let responseMessage: string;
+
+    if (moderation.crisis) {
+      replyStatus = "pending";
+      responseMessage = "Thank you for reaching out. We care about you. Please contact one of the support services below — they are here to help.";
+    } else if (moderation.approved) {
+      replyStatus = "approved";
+      responseMessage = "Your reply has been posted. Thank you for supporting the community.";
+    } else {
+      replyStatus = "pending";
+      responseMessage = "Your reply has been submitted and is pending review. Thank you for supporting the community.";
+    }
+
     const reply = await db.reply.create({
       data: {
         postId: id,
         anonymousName: generateAnonymousName(),
         content: content.trim(),
-        status: "pending",
+        status: replyStatus,
       },
     });
 
-    return NextResponse.json(
-      {
-        id: reply.id,
-        anonymousName: reply.anonymousName,
-        content: reply.content,
-        createdAt: reply.createdAt,
-        message: "Your reply has been submitted and is pending review. Thank you for supporting the community.",
-      },
-      { status: 201 }
-    );
+    const responseData: Record<string, unknown> = {
+      id: reply.id,
+      anonymousName: reply.anonymousName,
+      content: reply.content,
+      createdAt: reply.createdAt,
+      message: responseMessage,
+    };
+
+    if (moderation.crisis && moderation.helplines) {
+      responseData.crisisDetected = true;
+      responseData.crisisType = moderation.crisisType;
+      responseData.helplines = moderation.helplines;
+    }
+
+    if (!moderation.approved && !moderation.crisis) {
+      responseData.requiresReview = true;
+      responseData.flagReason = moderation.reason;
+    }
+
+    return NextResponse.json(responseData, { status: 201 });
+
   } catch (error) {
     console.error("Error creating reply:", error);
     return NextResponse.json({ error: "Failed to create reply" }, { status: 500 });
