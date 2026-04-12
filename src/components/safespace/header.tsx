@@ -40,7 +40,7 @@ export function Header() {
             </div>
             <div className="flex flex-col">
               <span className="text-lg font-semibold leading-tight text-foreground">
-                SafeSpace
+                Amoho
               </span>
               <span className="text-[10px] leading-tight text-muted-foreground">
                 Mental Health Support
