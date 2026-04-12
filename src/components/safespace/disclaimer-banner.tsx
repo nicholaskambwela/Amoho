@@ -3,7 +3,7 @@
 import { useSyncExternalStore, useCallback } from "react";
 import { AlertTriangle, X } from "lucide-react";
 
-const DISCLAIMER_KEY = "safespace_disclaimer_dismissed";
+const DISCLAIMER_KEY = "amoho_disclaimer_dismissed";
 
 function subscribe(callback: () => void) {
   window.addEventListener("storage", callback);
