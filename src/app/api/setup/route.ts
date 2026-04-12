@@ -18,8 +18,8 @@ export async function GET(_request: NextRequest) {
 
     await db.admin.create({
       data: {
-        name: "SafeSpace Admin",
-        email: "admin@safespace.zm",
+        name: "Amoho Admin",
+        email: "eliteminds06@gmail.com",
         phone: "",
         secret: hashedSecret,
         role: "superadmin",
@@ -29,7 +29,7 @@ export async function GET(_request: NextRequest) {
     const defaultEntries = [
       { key: "primary_phone", value: "+260 211 254073", label: "Chainama Hospital", icon: "phone", order: 0 },
       { key: "crisis_line", value: "933", label: "Lifeline Zambia (Crisis Line)", icon: "phone-call", order: 1 },
-      { key: "email", value: "info@safespace.zm", label: "Email Us", icon: "mail", order: 2 },
+      { key: "email", value: "eliteminds06@gmail.com", label: "Email Us", icon: "mail", order: 2 },
       { key: "whatsapp", value: "+260XXXXXXXXX", label: "WhatsApp", icon: "message-circle", order: 3 },
     ];
 
@@ -44,7 +44,7 @@ export async function GET(_request: NextRequest) {
     await db.post.create({
       data: {
         anonymousName: "Hopeful Soul",
-        content: "Welcome to SafeSpace! 💚 This is a safe, anonymous community where you can share what you're going through. Whether it's relationships, anxiety, depression, stress, or anything affecting your mental wellbeing — you're not alone here.",
+        content: "Welcome to Amoho! 💚 This is a safe, anonymous community where you can share what you're going through. Whether it's relationships, anxiety, depression, stress, or anything affecting your mental wellbeing — you're not alone here.",
         category: "Welcome",
         status: "approved",
       },
