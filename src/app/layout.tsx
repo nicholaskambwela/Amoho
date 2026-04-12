@@ -15,14 +15,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SafeSpace – Anonymous Mental Health Support Community",
+  title: "Amoho – Togrther, Anonymous Mental Health Support Community",
   description:
     "A safe, anonymous space to share what you're going through and find peer support. Whether it's relationships, anxiety, depression, or anything affecting your wellbeing — you're not alone.",
   icons: {
     icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
   },
   openGraph: {
-    title: "SafeSpace – Anonymous Mental Health Support",
+    title: "Amoho – Anonymous Mental Health Support",
     description:
       "A safe, anonymous space to share what you're going through and find peer support. You're not alone.",
     type: "website",
