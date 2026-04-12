@@ -41,7 +41,7 @@ export default function Home() {
                     You&apos;re not alone
                   </h1>
                   <p className="text-sm text-muted-foreground max-w-lg">
-                    SafeSpace is a safe, anonymous community where you can share
+                    Amoho is a safe, anonymous community where you can share
                     what you&apos;re going through — whether it&apos;s
                     relationships, anxiety, depression, stress, or anything
                     affecting your mental wellbeing. No accounts needed. Just
@@ -114,7 +114,7 @@ export default function Home() {
       <footer className="border-t border-border/30 py-6 mt-auto">
         <div className="mx-auto max-w-3xl px-4 text-center">
           <p className="text-xs text-muted-foreground">
-            SafeSpace — A peer support community. Not a substitute for professional help.
+            Amoho — A peer support community. Not a substitute for professional help.
           </p>
           <p className="mt-1 text-xs text-muted-foreground/60">
             If you or someone you know is in crisis, call <strong>933</strong> (Lifeline Zambia) or contact a local helpline or emergency services.
