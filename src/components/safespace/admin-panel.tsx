@@ -343,6 +343,46 @@ export function AdminPanel() {
     }
   };
 
+    const handleDeletePost = async (postId: string) => {
+    setActionLoading(postId);
+    try {
+      const res = await fetch(`/api/admin/posts/${postId}`, {
+        method: "DELETE",
+        headers: authHeaders(),
+      });
+      if (!res.ok) throw new Error("Delete failed");
+      setPosts((prev) => prev.filter((p) => p.id !== postId));
+      setPostsSummary((prev) =>
+        prev ? { ...prev, total: Math.max(0, prev.total - 1) } : prev
+      );
+      triggerRefresh();
+    } catch {
+      setError("Failed to delete post.");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteReply = async (replyId: string) => {
+    setActionLoading(replyId);
+    try {
+      const res = await fetch(`/api/admin/replies/${replyId}`, {
+        method: "DELETE",
+        headers: authHeaders(),
+      });
+      if (!res.ok) throw new Error("Delete failed");
+      setReplies((prev) => prev.filter((r) => r.id !== replyId));
+      setRepliesSummary((prev) =>
+        prev ? { ...prev, total: Math.max(0, prev.total - 1) } : prev
+      );
+      triggerRefresh();
+    } catch {
+      setError("Failed to delete reply.");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const handleAddAdmin = async () => {
     if (!newAdmin.name || !newAdmin.email || !newAdmin.secret) return;
     try {
@@ -604,29 +644,40 @@ export function AdminPanel() {
                     <p className="whitespace-pre-wrap text-sm text-foreground/80 line-clamp-3">
                       {post.content}
                     </p>
-                    {post.status === "pending" && (
-                      <div className="flex gap-2 pt-1">
-                        <Button
-                          size="sm"
-                          onClick={() => handlePostAction(post.id, "approved")}
-                          disabled={actionLoading === post.id}
-                          className="bg-safe-green/15 text-safe-green border border-safe-green/20 hover:bg-safe-green/25 h-8"
-                        >
-                          {actionLoading === post.id ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
-                          Approve
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => handlePostAction(post.id, "rejected")}
-                          disabled={actionLoading === post.id}
-                          variant="outline"
-                          className="border-destructive/30 text-destructive hover:bg-destructive/10 h-8"
-                        >
-                          <X className="h-3.5 w-3.5" />
-                          Reject
-                        </Button>
-                      </div>
-                    )}
+                    <div className="flex gap-2 pt-1">
+                      {post.status === "pending" && (
+                        <>
+                          <Button
+                            size="sm"
+                            onClick={() => handlePostAction(post.id, "approved")}
+                            disabled={actionLoading === post.id}
+                            className="bg-safe-green/15 text-safe-green border border-safe-green/20 hover:bg-safe-green/25 h-8"
+                          >
+                            {actionLoading === post.id ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
+                            Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => handlePostAction(post.id, "rejected")}
+                            disabled={actionLoading === post.id}
+                            variant="outline"
+                            className="border-destructive/30 text-destructive hover:bg-destructive/10 h-8"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                            Reject
+                          </Button>
+                        </>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleDeletePost(post.id)}
+                        disabled={actionLoading === post.id}
+                        className="text-destructive/50 hover:text-destructive hover:bg-destructive/10 h-8 ml-auto"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   </div>
                 );
               })}
@@ -696,29 +747,40 @@ export function AdminPanel() {
                       {reply.content}
                     </p>
 
-                    {reply.status === "pending" && (
-                      <div className="flex gap-2 pt-1">
-                        <Button
-                          size="sm"
-                          onClick={() => handleReplyAction(reply.id, "approved")}
-                          disabled={actionLoading === reply.id}
-                          className="bg-safe-green/15 text-safe-green border border-safe-green/20 hover:bg-safe-green/25 h-8"
-                        >
-                          {actionLoading === reply.id ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
-                          Approve
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => handleReplyAction(reply.id, "rejected")}
-                          disabled={actionLoading === reply.id}
-                          variant="outline"
-                          className="border-destructive/30 text-destructive hover:bg-destructive/10 h-8"
-                        >
-                          <X className="h-3.5 w-3.5" />
-                          Reject
-                        </Button>
-                      </div>
-                    )}
+                                        <div className="flex gap-2 pt-1">
+                      {reply.status === "pending" && (
+                        <>
+                          <Button
+                            size="sm"
+                            onClick={() => handleReplyAction(reply.id, "approved")}
+                            disabled={actionLoading === reply.id}
+                            className="bg-safe-green/15 text-safe-green border border-safe-green/20 hover:bg-safe-green/25 h-8"
+                          >
+                            {actionLoading === reply.id ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
+                            Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => handleReplyAction(reply.id, "rejected")}
+                            disabled={actionLoading === reply.id}
+                            variant="outline"
+                            className="border-destructive/30 text-destructive hover:bg-destructive/10 h-8"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                            Reject
+                          </Button>
+                        </>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleDeleteReply(reply.id)}
+                        disabled={actionLoading === reply.id}
+                        className="text-destructive/50 hover:text-destructive hover:bg-destructive/10 h-8 ml-auto"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   </div>
                 );
               })}
