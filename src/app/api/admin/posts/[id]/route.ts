@@ -63,27 +63,15 @@ export async function DELETE(
 
     const { id } = await params;
 
-    const post = await db.post.findUnique({
-      where: { id },
-    });
-
+    const post = await db.post.findUnique({ where: { id } });
     if (!post) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
-    // Delete all replies first (they are linked to this post)
-    await db.reply.deleteMany({
-      where: { postId: id },
-    });
+    await db.reply.deleteMany({ where: { postId: id } });
+    await db.post.delete({ where: { id } });
 
-    // Delete the post
-    await db.post.delete({
-      where: { id },
-    });
-
-    return NextResponse.json({
-      message: "Post and all replies deleted successfully.",
-    });
+    return NextResponse.json({ message: "Post deleted successfully." });
   } catch (error) {
     console.error("Error deleting post:", error);
     return NextResponse.json({ error: "Failed to delete post" }, { status: 500 });
