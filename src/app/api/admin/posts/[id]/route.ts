@@ -49,3 +49,43 @@ export async function PATCH(
     return NextResponse.json({ error: "Failed to update post" }, { status: 500 });
   }
 }
+
+// DELETE: Delete a post and all its replies
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const admin = await verifyAdmin(request);
+    if (!admin) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id } = await params;
+
+    const post = await db.post.findUnique({
+      where: { id },
+    });
+
+    if (!post) {
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+    }
+
+    // Delete all replies first (they are linked to this post)
+    await db.reply.deleteMany({
+      where: { postId: id },
+    });
+
+    // Delete the post
+    await db.post.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({
+      message: "Post and all replies deleted successfully.",
+    });
+  } catch (error) {
+    console.error("Error deleting post:", error);
+    return NextResponse.json({ error: "Failed to delete post" }, { status: 500 });
+  }
+}
