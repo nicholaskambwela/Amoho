@@ -21,18 +21,12 @@ export async function PATCH(
       return NextResponse.json({ error: "Invalid status. Use 'approved' or 'rejected'." }, { status: 400 });
     }
 
-    const post = await db.post.findUnique({
-      where: { id },
-    });
-
+    const post = await db.post.findUnique({ where: { id } });
     if (!post) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
-    const updatedPost = await db.post.update({
-      where: { id },
-      data: { status },
-    });
+    const updatedPost = await db.post.update({ where: { id }, data: { status } });
 
     return NextResponse.json({
       id: updatedPost.id,
