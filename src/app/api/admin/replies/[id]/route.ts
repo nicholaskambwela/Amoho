@@ -18,7 +18,10 @@ export async function PATCH(
     const { status } = body;
 
     if (!["approved", "rejected"].includes(status)) {
-      return NextResponse.json({ error: "Invalid status. Use 'approved' or 'rejected'." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid status. Use 'approved' or 'rejected'." },
+        { status: 400 }
+      );
     }
 
     const reply = await db.reply.findUnique({
@@ -29,18 +32,18 @@ export async function PATCH(
       return NextResponse.json({ error: "Reply not found" }, { status: 404 });
     }
 
-    const updatedReply = await db.reply.update({
+    const updated = await db.reply.update({
       where: { id },
       data: { status },
     });
 
     return NextResponse.json({
-      id: updatedReply.id,
-      anonymousName: updatedReply.anonymousName,
-      content: updatedReply.content,
-      status: updatedReply.status,
-      createdAt: updatedReply.createdAt,
-      updatedAt: updatedReply.updatedAt,
+      id: updated.id,
+      anonymousName: updated.anonymousName,
+      content: updated.content,
+      status: updated.status,
+      createdAt: updated.createdAt,
+      updatedAt: updated.updatedAt,
       message: `Reply has been ${status}.`,
     });
   } catch (error) {
@@ -49,7 +52,7 @@ export async function PATCH(
   }
 }
 
-// DELETE: Delete a reply
+// DELETE: Delete a single reply
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -62,21 +65,14 @@ export async function DELETE(
 
     const { id } = await params;
 
-    const reply = await db.reply.findUnique({
-      where: { id },
-    });
-
+    const reply = await db.reply.findUnique({ where: { id } });
     if (!reply) {
       return NextResponse.json({ error: "Reply not found" }, { status: 404 });
     }
 
-    await db.reply.delete({
-      where: { id },
-    });
+    await db.reply.delete({ where: { id } });
 
-    return NextResponse.json({
-      message: "Reply deleted successfully.",
-    });
+    return NextResponse.json({ message: "Reply deleted successfully." });
   } catch (error) {
     console.error("Error deleting reply:", error);
     return NextResponse.json({ error: "Failed to delete reply" }, { status: 500 });
