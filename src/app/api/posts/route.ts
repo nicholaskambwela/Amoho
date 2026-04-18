@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { content, category } = body;
+    const { content, category, anonymousName } = body;
 
     if (!content || typeof content !== "string") {
       return NextResponse.json({ error: "Content is required" }, { status: 400 });
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
 
     const post = await db.post.create({
       data: {
-        anonymousName: generateAnonymousName(),
+        anonymousName: (anonymousName && typeof anonymousName === "string" && anonymousName.trim().length > 0) ? anonymousName.trim() : generateAnonymousName(),
         content: content.trim(),
         category: postCategory,
         status: postStatus,
