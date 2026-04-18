@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CATEGORIES } from "@/lib/categories";
+import { getAnonName } from "@/lib/anon-name";
 import { Send, CheckCircle2, Loader2, Phone, Heart } from "lucide-react";
 
 interface HelplineInfo {
@@ -60,7 +61,7 @@ export function PostForm({ onSuccess }: { onSuccess?: () => void }) {
       const res = await fetch("/api/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: content.trim(), category }),
+        body: JSON.stringify({ content: content.trim(), category, anonymousName: getAnonName() }),
       });
 
       const data = await res.json();
