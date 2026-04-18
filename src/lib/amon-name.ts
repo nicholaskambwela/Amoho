@@ -1,14 +1,19 @@
-import { generateAnonymousName } from "./anonymous-names";
+"use client";
+
+import { generateAnonymousName } from "@/lib/anonymous-names";
 
 const STORAGE_KEY = "amoho_anon_name";
 
-export function getAnonymousName(): string {
-  if (typeof window === "undefined") return "";
+export function getAnonName(): string {
+  if (typeof window === "undefined") {
+    return generateAnonymousName();
+  }
 
-  const existing = localStorage.getItem(STORAGE_KEY);
-  if (existing) return existing;
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored) {
+    return stored;
+  }
 
-  // First visit — generate and save
   const name = generateAnonymousName();
   localStorage.setItem(STORAGE_KEY, name);
   return name;
