@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Send, CheckCircle2, Loader2, MessageCircle, Clock, Phone, Heart } from "lucide-react";
 import { formatTimeAgo } from "@/lib/time-format";
 import { useStore } from "@/lib/store";
+import { getAnonName } from "@/lib/anon-name";
 
 interface Reply {
   id: string;
@@ -59,7 +60,7 @@ export function ReplySection({ postId, replies }: ReplySectionProps) {
       const res = await fetch(`/api/posts/${postId}/replies`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: content.trim() }),
+        body: JSON.stringify({ content: content.trim(), anonymousName: getAnonName() }),
       });
 
       const data = await res.json();
