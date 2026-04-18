@@ -167,10 +167,10 @@ export function PostForm({ onSuccess }: { onSuccess?: () => void }) {
           </div>
         )}
 
-        {/* Crisis Helplines - shown prominently when crisis detected */}
+               {/* Crisis Helplines - shown prominently when crisis detected */}
         {crisisHelplines && (
-          <div className="rounded-lg border border-amber-500/30 bg-amber-50/80 p-4 space-y-3 animate-fade-in">
-            <div className="flex items-center gap-2 text-amber-700">
+          <div className="rounded-lg border border-primary/30 bg-primary/10 p-4 space-y-3 animate-fade-in">
+            <div className="flex items-center gap-2 text-primary">
               <Heart className="h-4 w-4 shrink-0" />
               <p className="text-sm font-medium">
                 We care about you. Please reach out — these services are here to help.
@@ -182,12 +182,12 @@ export function PostForm({ onSuccess }: { onSuccess?: () => void }) {
                   key={idx}
                   className={`flex items-center justify-between gap-2 rounded-md p-2 ${
                     idx === 0
-                      ? "bg-amber-100/60 border border-amber-200/50"
-                      : "bg-white/60 border border-amber-100/50"
+                      ? "bg-primary/15"
+                      : "bg-card border border-border/50"
                   }`}
                 >
                   <div className="min-w-0">
-                    <p className={`text-sm font-medium ${idx === 0 ? "text-amber-800" : "text-foreground"}`}>
+                    <p className={`text-sm font-medium ${idx === 0 ? "text-primary" : "text-foreground"}`}>
                       {helpline.name}
                       {helpline.city && helpline.city !== "Nationwide" && (
                         <span className="ml-1.5 text-xs text-muted-foreground">
@@ -199,7 +199,7 @@ export function PostForm({ onSuccess }: { onSuccess?: () => void }) {
                   </div>
                   <a
                     href={`tel:${helpline.phone.replace(/\s/g, "")}`}
-                    className="flex items-center gap-1.5 shrink-0 rounded-md bg-amber-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-700 transition-colors"
+                    className="flex items-center gap-1.5 shrink-0 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/85 transition-colors"
                   >
                     <Phone className="h-3 w-3" />
                     {helpline.phone}
@@ -207,7 +207,7 @@ export function PostForm({ onSuccess }: { onSuccess?: () => void }) {
                 </div>
               ))}
               {crisisHelplines.length > 5 && (
-                <p className="text-xs text-amber-600 pt-1">
+                <p className="text-xs text-primary pt-1">
                   +{crisisHelplines.length - 5} more services available in the Resources tab
                 </p>
               )}
@@ -217,7 +217,7 @@ export function PostForm({ onSuccess }: { onSuccess?: () => void }) {
 
         {/* Flagged content notice */}
         {flagReason && !crisisHelplines && (
-          <div className="rounded-lg border border-amber-500/20 bg-amber-50/50 p-3 text-sm text-amber-700 animate-fade-in">
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 text-sm text-primary animate-fade-in">
             <span className="font-medium">Under review: </span>
             Your post is being reviewed by our team and will appear once approved.
           </div>
