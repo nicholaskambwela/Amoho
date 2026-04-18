@@ -163,7 +163,7 @@ export function ReplySection({ postId, replies }: ReplySectionProps) {
                   key={idx}
                   className={`flex items-center justify-between gap-2 rounded-md p-2 ${
                     idx === 0
-                      ? "bg-amber-100/60 border border-amber-200/50"
+                      ? " bg-amber-50/80 dark:bg-amber-950/40"
                       : "bg-white/60 border border-amber-100/50"
                   }`}
                 >
