@@ -168,7 +168,7 @@ export function ReplySection({ postId, replies }: ReplySectionProps) {
                   }`}
                 >
                   <div className="min-w-0">
-                    <p className={`text-sm font-medium ${idx === 0 ? "text-amber-800" : "text-foreground"}`}>
+                    <p className={`text-sm font-medium ${idx === 0 ? "text-amber-800 dark:text-amber-200" : "text-foreground"}`}>
                       {helpline.name}
                       {helpline.city && helpline.city !== "Nationwide" && (
                         <span className="ml-1.5 text-xs text-muted-foreground">
