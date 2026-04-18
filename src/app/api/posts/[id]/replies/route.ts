@@ -44,7 +44,7 @@ export async function POST(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { content } = body;
+    const { content, anonymousName } = body;
 
     if (!content || typeof content !== "string") {
       return NextResponse.json({ error: "Reply content is required" }, { status: 400 });
@@ -85,7 +85,7 @@ export async function POST(
     const reply = await db.reply.create({
       data: {
         postId: id,
-        anonymousName: generateAnonymousName(),
+        anonymousName: (anonymousName && typeof anonymousName === "string" && anonymousName.trim().length > 0) ? anonymousName.trim() : generateAnonymousName(),
         content: content.trim(),
         status: replyStatus,
       },
