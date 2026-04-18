@@ -11,7 +11,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CATEGORIES } from "@/lib/categories";
-import { Send, CheckCircle2, Loader2 } from "lucide-react";
+import { Send, CheckCircle2, Loader2, Phone, Heart } from "lucide-react";
+
+interface HelplineInfo {
+  name: string;
+  phone: string;
+  type: string;
+  city: string;
+}
 
 export function PostForm({ onSuccess }: { onSuccess?: () => void }) {
   const [content, setContent] = useState("");
@@ -19,6 +26,8 @@ export function PostForm({ onSuccess }: { onSuccess?: () => void }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [crisisHelplines, setCrisisHelplines] = useState<HelplineInfo[] | null>(null);
+  const [flagReason, setFlagReason] = useState<string | null>(null);
 
   const charCount = content.length;
   const minChars = 20;
@@ -28,6 +37,8 @@ export function PostForm({ onSuccess }: { onSuccess?: () => void }) {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+    setCrisisHelplines(null);
+    setFlagReason(null);
 
     if (content.trim().length < minChars) {
       setError(
@@ -60,6 +71,17 @@ export function PostForm({ onSuccess }: { onSuccess?: () => void }) {
       }
 
       setSuccess(data.message || "Your story has been submitted for review.");
+
+      // If crisis detected, show helplines prominently
+      if (data.crisisDetected && data.helplines && data.helplines.length > 0) {
+        setCrisisHelplines(data.helplines);
+      }
+
+      // If flagged (not crisis), show the reason
+      if (data.requiresReview && data.flagReason) {
+        setFlagReason(data.flagReason);
+      }
+
       setContent("");
       setCategory("General");
       onSuccess?.();
@@ -145,7 +167,64 @@ export function PostForm({ onSuccess }: { onSuccess?: () => void }) {
           </div>
         )}
 
-        {success && (
+        {/* Crisis Helplines - shown prominently when crisis detected */}
+        {crisisHelplines && (
+          <div className="rounded-lg border border-amber-500/30 bg-amber-50/80 p-4 space-y-3 animate-fade-in">
+            <div className="flex items-center gap-2 text-amber-700">
+              <Heart className="h-4 w-4 shrink-0" />
+              <p className="text-sm font-medium">
+                We care about you. Please reach out — these services are here to help.
+              </p>
+            </div>
+            <div className="space-y-2">
+              {crisisHelplines.slice(0, 5).map((helpline, idx) => (
+                <div
+                  key={idx}
+                  className={`flex items-center justify-between gap-2 rounded-md p-2 ${
+                    idx === 0
+                      ? "bg-amber-100/60 border border-amber-200/50"
+                      : "bg-white/60 border border-amber-100/50"
+                  }`}
+                >
+                  <div className="min-w-0">
+                    <p className={`text-sm font-medium ${idx === 0 ? "text-amber-800" : "text-foreground"}`}>
+                      {helpline.name}
+                      {helpline.city && helpline.city !== "Nationwide" && (
+                        <span className="ml-1.5 text-xs text-muted-foreground">
+                          — {helpline.city}
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{helpline.type}</p>
+                  </div>
+                  <a
+                    href={`tel:${helpline.phone.replace(/\s/g, "")}`}
+                    className="flex items-center gap-1.5 shrink-0 rounded-md bg-amber-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-700 transition-colors"
+                  >
+                    <Phone className="h-3 w-3" />
+                    {helpline.phone}
+                  </a>
+                </div>
+              ))}
+              {crisisHelplines.length > 5 && (
+                <p className="text-xs text-amber-600 pt-1">
+                  +{crisisHelplines.length - 5} more services available in the Resources tab
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Flagged content notice */}
+        {flagReason && !crisisHelplines && (
+          <div className="rounded-lg border border-amber-500/20 bg-amber-50/50 p-3 text-sm text-amber-700 animate-fade-in">
+            <span className="font-medium">Under review: </span>
+            Your post is being reviewed by our team and will appear once approved.
+          </div>
+        )}
+
+        {/* Normal success (no crisis, no flag) */}
+        {success && !crisisHelplines && !flagReason && (
           <div className="flex items-center gap-2 rounded-lg border border-safe-green/20 bg-safe-green/5 p-3 text-sm text-safe-green animate-fade-in">
             <CheckCircle2 className="h-4 w-4 shrink-0" />
             {success}
