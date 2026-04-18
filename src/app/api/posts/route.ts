@@ -77,48 +77,44 @@ export async function POST(request: NextRequest) {
     const moderation = await moderateContent(content.trim());
 
     let postStatus: "approved" | "pending";
-let responseMessage: string;
-let helplines: any[] = [];
+    let responseMessage: string;
 
-if (moderation.crisis) {
-  postStatus = "pending";
-  
-  if (moderation.helplines && moderation.helplines.length > 0) {
-    responseMessage = "Thank you for sharing. We care about you and want to make sure you're okay. Please reach out to one of the support services below — they are here to help you.";
-    helplines = moderation.helplines;
-  } else {
-    responseMessage = "Thank you for sharing. We care about you. Our team will reach out soon with support resources.";
-  }
-} else if (moderation.approved) {
-  postStatus = "approved";
-  responseMessage = "Your story has been shared with the community. Thank you for being brave enough to share — you're not alone.";
-} else {
-  postStatus = "pending";
-  responseMessage = "Your story has been submitted for review. It will appear in the community feed once approved. Thank you for sharing.";
-}
+    if (moderation.crisis) {
+      postStatus = "pending";
+      responseMessage = "Thank you for sharing. We care about you and want to make sure you're okay. Please reach out to one of the support services below — they are here to help you.";
+    } else if (moderation.approved) {
+      postStatus = "approved";
+      responseMessage = "Your story has been shared with the community. Thank you for being brave enough to share — you're not alone.";
+    } else {
+      postStatus = "pending";
+      responseMessage = "Your story has been submitted for review. It will appear in the community feed once approved. Thank you for sharing.";
+    }
 
-const responseData: Record<string, unknown> = {
-  id: post.id,
-  anonymousName: post.anonymousName,
-  content: post.content,
-  category: post.category,
-  status: post.status,
-  createdAt: post.createdAt,
-  message: responseMessage,
-};
+    const post = await db.post.create({
+      data: {
+        anonymousName: generateAnonymousName(),
+        content: content.trim(),
+        category: postCategory,
+        status: postStatus,
+      },
+    });
 
-if (moderation.crisis) {
-  responseData.crisisDetected = true;
-  responseData.crisisType = moderation.crisisType;
-  if (helplines.length > 0) {
-    responseData.helplines = helplines;
-  }
-}
+    const responseData: Record<string, unknown> = {
+      id: post.id,
+      anonymousName: post.anonymousName,
+      content: post.content,
+      category: post.category,
+      status: post.status,
+      createdAt: post.createdAt,
+      message: responseMessage,
+    };
 
-if (!moderation.approved && !moderation.crisis) {
-  responseData.requiresReview = true;
-  responseData.flagReason = moderation.reason;
-}
+    if (moderation.crisis && moderation.helplines) {
+      responseData.crisisDetected = true;
+      responseData.crisisType = moderation.crisisType;
+      responseData.helplines = moderation.helplines;
+    }
+
     if (!moderation.approved && !moderation.crisis) {
       responseData.requiresReview = true;
       responseData.flagReason = moderation.reason;
