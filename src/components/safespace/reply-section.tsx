@@ -148,10 +148,10 @@ export function ReplySection({ postId, replies }: ReplySectionProps) {
           <p className="text-xs text-destructive">{error}</p>
         )}
 
-        {/* Crisis Helplines - shown prominently when crisis detected */}
+                {/* Crisis Helplines - shown prominently when crisis detected */}
         {crisisHelplines && (
-          <div className="rounded-lg border border-amber-500/30 bg-amber-50/80 p-4 space-y-3 animate-fade-in">
-            <div className="flex items-center gap-2 text-amber-700">
+          <div className="rounded-lg border border-primary/30 bg-primary/10 p-4 space-y-3 animate-fade-in">
+            <div className="flex items-center gap-2 text-primary">
               <Heart className="h-4 w-4 shrink-0" />
               <p className="text-sm font-medium">
                 We care about you. Please reach out — these services are here to help.
@@ -163,12 +163,12 @@ export function ReplySection({ postId, replies }: ReplySectionProps) {
                   key={idx}
                   className={`flex items-center justify-between gap-2 rounded-md p-2 ${
                     idx === 0
-                      ? " bg-amber-50/80 dark:bg-amber-950/40"
-                      : "bg-white/60 border border-amber-100/50"
+                      ? "bg-primary/15"
+                      : "bg-card border border-border/50"
                   }`}
                 >
                   <div className="min-w-0">
-                    <p className={`text-sm font-medium ${idx === 0 ? "text-amber-800 dark:text-amber-200" : "text-foreground"}`}>
+                    <p className={`text-sm font-medium ${idx === 0 ? "text-primary" : "text-foreground"}`}>
                       {helpline.name}
                       {helpline.city && helpline.city !== "Nationwide" && (
                         <span className="ml-1.5 text-xs text-muted-foreground">
@@ -180,7 +180,7 @@ export function ReplySection({ postId, replies }: ReplySectionProps) {
                   </div>
                   <a
                     href={`tel:${helpline.phone.replace(/\s/g, "")}`}
-                    className="flex items-center gap-1.5 shrink-0 rounded-md bg-amber-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-700 transition-colors"
+                    className="flex items-center gap-1.5 shrink-0 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/85 transition-colors"
                   >
                     <Phone className="h-3 w-3" />
                     {helpline.phone}
@@ -188,7 +188,7 @@ export function ReplySection({ postId, replies }: ReplySectionProps) {
                 </div>
               ))}
               {crisisHelplines.length > 5 && (
-                <p className="text-xs text-amber-600 pt-1">
+                <p className="text-xs text-primary pt-1">
                   +{crisisHelplines.length - 5} more services available in the Resources tab
                 </p>
               )}
@@ -198,11 +198,10 @@ export function ReplySection({ postId, replies }: ReplySectionProps) {
 
         {/* Flagged reply notice */}
         {flagReason && !crisisHelplines && (
-          <div className="rounded-lg border border-amber-500/20 bg-amber-50/50 p-2 text-xs text-amber-700 animate-fade-in">
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-2 text-xs text-primary animate-fade-in">
             Your reply is being reviewed and will appear once approved.
           </div>
         )}
-
         {/* Normal success (no crisis, no flag) */}
         {success && !crisisHelplines && !flagReason && (
           <p className="flex items-center gap-1 text-xs text-safe-green">
