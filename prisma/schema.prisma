@@ -12,7 +12,9 @@ model Post {
   anonymousName  String
   content        String
   category       String   @default("General")
-  status         String   @default("pending") // pending, approved, rejected
+  status         String   @default("pending")
+  hearts         Int      @default(0)
+  cries          Int      @default(0)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   replies        Reply[]
@@ -25,6 +27,8 @@ model Reply {
   anonymousName  String
   content        String
   status         String   @default("pending") // pending, approved, rejected — now requires admin approval
+  hearts         Int      @default(0)
+  cries          Int      @default(0)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
