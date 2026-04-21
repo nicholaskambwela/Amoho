@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Amoho – Togrther, Anonymous Mental Health Support Community",
+  title: "Amoho – Together, Anonymous Mental Health Support Community",
   description:
     "A safe, anonymous space to share what you're going through and find peer support. Whether it's relationships, anxiety, depression, or anything affecting your wellbeing — you're not alone.",
   icons: {
