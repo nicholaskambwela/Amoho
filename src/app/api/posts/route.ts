@@ -26,11 +26,12 @@ export async function GET(request: NextRequest) {
       content: post.content,
       category: post.category,
       status: post.status,
+      hearts: post.hearts,
+      cries: post.cries,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
       replyCount: post._count.replies,
     }));
-
     return NextResponse.json(postsWithCounts);
   } catch (error) {
     console.error("Error fetching posts:", error);
