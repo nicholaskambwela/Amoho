@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   description:
     "A safe, anonymous space to share what you're going through and find peer support. Whether it's relationships, anxiety, depression, or anything affecting your wellbeing — you're not alone.",
   icons: {
-    icon: "icon: "/amoho-icon.png",
+    icon: "icon: "https://z-cdn.chatglm.cn/z-ai/static/logo.svg",
   },
   openGraph: {
     title: "Amoho – Anonymous Mental Health Support",
