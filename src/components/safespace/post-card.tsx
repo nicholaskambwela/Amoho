@@ -1,6 +1,8 @@
 "use client";
 
-import { MessageCircle, Clock, Share2 } from "lucide-react";
+import { MessageCircle, Clock, Share2, Heart } from "lucide-react";
+import { useState } from "react";
+import { hasReacted, toggleReaction } from "@/lib/reactions";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { generateWhatsAppLink } from "@/lib/whatsapp";
@@ -15,6 +17,8 @@ interface PostCardProps {
     category: string;
     createdAt: string;
     replyCount: number;
+    hearts?: number;
+    cries?: number;
   };
 }
 
@@ -40,6 +44,10 @@ const categoryColors: Record<string, string> = {
 
 export function PostCard({ post }: PostCardProps) {
   const { selectPost } = useStore();
+const [hearted, setHearted] = useState(() => hasReacted(post.id, "heart"));
+const [cried, setCried] = useState(() => hasReacted(post.id, "cry"));
+const [hearts, setHearts] = useState(post.hearts || 0);
+const [cries, setCries] = useState(post.cries || 0);
   const excerpt =
     post.content.length > 200
       ? post.content.substring(0, 200) + "..."
@@ -51,6 +59,37 @@ export function PostCard({ post }: PostCardProps) {
     const link = generateWhatsAppLink(post.id, post.content);
     window.open(link, "_blank");
   };
+  const handleReact = async (e: React.MouseEvent, type: "heart" | "cry") => {
+  e.stopPropagation();
+
+  const alreadyReacted = type === "heart" ? hearted : cried;
+
+  try {
+    if (alreadyReacted) {
+      const res = await fetch(`/api/posts/${post.id}/react?type=${type}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      setHearts(data.hearts);
+      setCries(data.cries);
+    } else {
+      const res = await fetch(`/api/posts/${post.id}/react`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type }),
+      });
+      const data = await res.json();
+      setHearts(data.hearts);
+      setCries(data.cries);
+    }
+
+    toggleReaction(post.id, type);
+    if (type === "heart") setHearted(!hearted);
+    else setCried(!cried);
+  } catch {
+    // silent fail
+  }
+};
 
   return (
     <Card
@@ -87,14 +126,43 @@ export function PostCard({ post }: PostCardProps) {
         </div>
       </div>
 
-      {/* Footer: Reply Count + Share */}
+            {/* Footer: Reactions + Reply Count + Share */}
       <div className="mt-4 flex items-center justify-between border-t border-border/30 pt-3">
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <MessageCircle className="h-3.5 w-3.5" />
-          <span>
-            {post.replyCount}{" "}
-            {post.replyCount === 1 ? "reply" : "replies"}
-          </span>
+        <div className="flex items-center gap-1">
+          {/* Heart button */}
+          <button
+            onClick={(e) => handleReact(e, "heart")}
+            className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors ${
+              hearted
+                ? "text-red-500 bg-red-500/10"
+                : "text-muted-foreground hover:bg-red-500/10 hover:text-red-500"
+            }`}
+          >
+            <Heart className={`h-3.5 w-3.5 ${hearted ? "fill-current" : ""}`} />
+            <span>{hearts}</span>
+          </button>
+
+          {/* Cry button */}
+          <button
+            onClick={(e) => handleReact(e, "cry")}
+            className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors ${
+              cried
+                ? "text-safe-blue bg-safe-blue/10"
+                : "text-muted-foreground hover:bg-safe-blue/10 hover:text-safe-blue"
+            }`}
+          >
+            <span>😢</span>
+            <span>{cries}</span>
+          </button>
+
+          {/* Reply count */}
+          <div className="flex items-center gap-1.5 pl-1 text-xs text-muted-foreground">
+            <MessageCircle className="h-3.5 w-3.5" />
+            <span>
+              {post.replyCount}{" "}
+              {post.replyCount === 1 ? "reply" : "replies"}
+            </span>
+          </div>
         </div>
 
         <button
